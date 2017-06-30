@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.gyyx.elves.queue.dao.QueueDao">
+
+	<insert id="createQueue" >
+		INSERT INTO queue(queue_id,app,createtime,`status`) 
+		VALUES
+		(#{0},#{1},NOW(),'pendding')
+	</insert>
+
+	<select id="getQueue" parameterType="String" resultType="Queue">
+		SELECT * FROM queue WHERE queue_id=#{0}
+	</select>
+	
+	<select id="getTask" parameterType="String" resultType="Task">
+		SELECT * FROM task_list WHERE task_id=#{0}
+	</select>
+
+	<insert id="addTask" parameterType="Task">
+		INSERT INTO task_list(queue_id,task_id,ip,`mode`,app,func,param,timeout,proxy,depend_task_id,create_time) 
+		VALUES
+		(#{queueId},#{taskId},#{ip},#{mode},#{app},#{func},#{param},#{timeout},#{proxy},#{dependTaskId},NOW())
+	</insert>
+	
+	<update id="commitQueue" parameterType="String">
+		UPDATE queue SET `status`='running',committime=NOW() WHERE queue_id=#{0} and `status`='pendding'
+	</update>
+	
+	<select id="getTasks" parameterType="String" resultType="Task">
+		SELECT task_id,ip,`mode`,app,func,param,timeout,proxy FROM task_list WHERE queue_id=#{0} and depend_task_id='' || depend_task_id IS NULL and `status`='pendding'
+	</select>
+
+	<select id="getNextTasks" parameterType="String" resultType="Task">
+		SELECT task_id,ip,`mode`,app,func,param,timeout,proxy FROM task_list WHERE queue_id = (SELECT queue_id FROM task_list WHERE task_id=#{0}) AND depend_task_id=#{0} AND `status`="pendding"
+	</select>
+
+	<update id="saveResult" parameterType="Result">
+		UPDATE task_list SET flag=#{flag},error=#{error},worker_flag=#{workerFlag},worker_message=#{workerMessage},worker_costtime=#{workerCosttime},exec_finish_time=NOW(),`status`=#{status}  WHERE task_id=#{id}
+	</update>
+
+	<select id="getResults" parameterType="String" resultType="Result">
+		SELECT task_id as id,depend_task_id,flag,error,worker_flag,param,worker_message,worker_costtime,`status` FROM task_list WHERE queue_id=#{0}
+	</select>
+
+	<update id="stopQueue" parameterType="String">
+		UPDATE queue SET status='stopped' WHERE queue_id = #{0}
+	</update>
+	
+	<update id="stopTask" parameterType="String">
+		UPDATE task_list SET `status`="stopped" WHERE queue_id=#{0} AND `status`="pendding"
+	</update>
+
+	<update id="updateTaskStatus" parameterType="String">
+		UPDATE task_list SET `status`=#{1} WHERE task_id=#{0}
+	</update>
+	
+</mapper>
