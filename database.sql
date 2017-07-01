@@ -37,7 +37,7 @@ CREATE TABLE `task_list` (
   `task_id` varchar(16) NOT NULL COMMENT '任务ID',
   `queue_id` varchar(16) NOT NULL COMMENT '队列ID',
   `ip` varchar(15) NOT NULL COMMENT 'AgentIP',
-  `mode` enum('np','n') NOT NULL COMMENT '模式',
+  `mode` enum('np','p') NOT NULL COMMENT '模式',
   `app` varchar(32) NOT NULL COMMENT '模块',
   `func` varchar(32) NOT NULL COMMENT '指令',
   `param` text COMMENT '参数',
