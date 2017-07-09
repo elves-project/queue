@@ -25,7 +25,10 @@ public class PropertyLoader {
 	
 	// 读取资源文件,设置输入流
 	private static InputStream is = null;
-	
+
+	//zookeeper.enabled
+	public static String ZOOKEEPER_ENABLED;
+
 	//zk host
 	public static String ZOOKEEPER_HOST;
 	
@@ -54,7 +57,8 @@ public class PropertyLoader {
 		try {
 			is = new FileInputStream(SpringUtil.PROPERTIES_CONFIG_PATH);;
 			properties.load(is);
-			
+
+			ZOOKEEPER_ENABLED=properties.getProperty("zookeeper.enabled");
 			ZOOKEEPER_HOST = properties.getProperty("zookeeper.host");
     		ZOOKEEPER_OUT_TIME =Integer.parseInt(properties.getProperty("zookeeper.outTime"));
     		ZOOKEEPER_ROOT = properties.getProperty("zookeeper.root");
